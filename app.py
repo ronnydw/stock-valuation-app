@@ -15,9 +15,9 @@ def reverse_dcf(fcf, discount_rate, terminal_value, shares_outstanding):
 def free_cashflow_yield(fcf, market_cap):
     return fcf / market_cap
 
-st.title("Stock Valuation App")
+st.title("Minotaurus Waardering App")
 
-st.sidebar.header("User Input Parameters")
+st.sidebar.header("Input Parameters")
 
 # Input for Yahoo Finance ticker symbol
 ticker_symbol = st.sidebar.text_input("Yahoo Finance Ticker Symbol", value="AAPL").upper()
