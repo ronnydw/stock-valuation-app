@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.express as px
 import numpy as np
+import yfinance as yf
 
 def earnings_growth_model(fcf, growth_rate, discount_rate, years=10):
     future_fcf = [fcf * (1 + growth_rate) ** i for i in range(1, years + 1)]
@@ -18,6 +19,17 @@ st.title("Stock Valuation App")
 
 st.sidebar.header("User Input Parameters")
 
+# Input for Yahoo Finance ticker symbol
+ticker_symbol = st.sidebar.text_input("Yahoo Finance Ticker Symbol", value="AAPL").upper()
+
+# Fetch company information using yfinance
+try:
+    ticker = yf.Ticker(ticker_symbol)
+    company_name = ticker.info['longName']
+except KeyError:
+    st.error("Invalid ticker symbol. Please enter a valid Yahoo Finance ticker symbol.")
+    st.stop()
+
 growth_rate = st.sidebar.number_input("Expected EPS or FCF growth (%)", value=11.0) / 100
 discount_rate = st.sidebar.number_input("Discount rate - DCF (%)", value=10.0) / 100
 terminal_value = st.sidebar.number_input("Terminal value (%)", value=3.0) / 100
@@ -34,6 +46,10 @@ st.write(f"Earnings Growth Model Valuation: ${valuation_egm:.2f} million")
 st.write(f"Reverse Discounted Cash Flow Valuation: ${valuation_dcf:.2f} per share")
 st.write(f"Free Cash Flow Yield: {yield_fcf:.2%}")
 
-fig = px.bar(x=["EGM", "Reverse DCF", "FCF Yield"], y=[valuation_egm, valuation_dcf, yield_fcf * market_cap],
-             labels={'x': "Valuation Method", 'y': "Value (in million)"}, title="Valuation Comparisons")
+fig = px.bar(
+    x=["EGM", "Reverse DCF", "FCF Yield"],
+    y=[valuation_egm, valuation_dcf, yield_fcf * market_cap],
+    labels={'x': "Valuation Method", 'y': "Value (in million)"},
+    title=f"Valuation Comparisons for {company_name}"
+)
 st.plotly_chart(fig)
